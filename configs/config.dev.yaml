@@ -1,0 +1,34 @@
+app:
+  name: "telegram-bot"
+  environment: "development"
+
+server:
+  port: "8080"
+  host: "localhost"
+
+telegram:
+  timeout: "10s"
+  main_group_id: "-1001999851882"
+  vip_group_id: "-1001856345480"
+
+exchange:
+  api_key: ""
+  secret_key: ""
+  passphrase: ""
+  customer_list: "/api/broker/v1/agent/customerList"
+  customer_trade_volume: "/api/broker/v1/agent/customerTradeVolumnList"
+
+database:
+  host: localhost
+  port: 3306
+  user: "user"
+  password: "pass"
+  database: "omcc"
+  max_idle_connections: 10
+  max_open_connections: 100
+  max_lifetime: "1h"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
