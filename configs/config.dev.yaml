@@ -8,8 +8,7 @@ server:
 
 telegram:
   timeout: "10s"
-  main_group_id: "-1001999851882"
-  vip_group_id: "-1001856345480"
+  group: -1001999851882,-1001856345480
 
 exchange:
   api_key: ""

@@ -3,6 +3,7 @@ package exception
 import (
 	"errors"
 	"fmt"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/repository"
@@ -21,27 +22,27 @@ func (h *ErrorHandler) HandleServiceError(err error, context map[string]interfac
 	switch {
 	case errors.Is(err, service.ErrUIDNotFound):
 		return &CommandError{
-			Message: fmt.Sprintf("❌ UID %s 不存在，请检查后重试。", context["uid"]),
+			Message: fmt.Sprintf(common.InvalidUidVerifyReplyMessage),
 			Type:    ErrInvalidFormat,
 		}
 	case errors.Is(err, service.ErrServiceUnavailable):
 		return &CommandError{
-			Message: "验证服务暂时不可用，请稍后重试",
+			Message: common.ServerErrorMessage,
 			Type:    ErrServiceUnavailable,
 		}
 	case errors.Is(err, repository.ErrCustomerExists):
 		return &CommandError{
-			Message: "该用户已存在",
+			Message: "Unknown Error",
 			Type:    ErrInvalidFormat,
 		}
 	case errors.Is(err, repository.ErrSocialBindingExists):
 		return &CommandError{
-			Message: "该社交账号已被绑定",
+			Message: common.ExistsSocialUserIdVerifyReplyMessage,
 			Type:    ErrInvalidFormat,
 		}
 	case errors.Is(err, repository.ErrTradingBindingExists):
 		return &CommandError{
-			Message: "UID已被绑定 请联系",
+			Message: common.ExistsUidVerifyReplyMessage,
 			Type:    ErrInvalidFormat,
 		}
 	default:
@@ -50,7 +51,7 @@ func (h *ErrorHandler) HandleServiceError(err error, context map[string]interfac
 			logger.Any("context", context),
 		)
 		return &CommandError{
-			Message: "操作过程中发生错误，请稍后重试",
+			Message: common.InternalServerErrorMessage,
 			Type:    ErrInternal,
 		}
 	}

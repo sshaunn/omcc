@@ -1,4 +1,4 @@
-package handler
+package private
 
 import (
 	tele "gopkg.in/telebot.v3"

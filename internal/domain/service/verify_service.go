@@ -26,6 +26,7 @@ var (
 type VerifyService struct {
 	client                   *exchange.Client
 	db                       *gorm.DB
+	Cfg                      *config.TelegramConfig
 	customerRepository       *repository.CustomerRepository
 	socialBindingRepository  *repository.CustomerSocialBindingRepository
 	tradingBindingRepository *repository.CustomerTradingBindingRepository
@@ -41,6 +42,7 @@ func NewVerifyService(cfg *config.Config, client *exchange.Client, log logger.Lo
 	return &VerifyService{
 		client:                   client,
 		db:                       db,
+		Cfg:                      &cfg.Telegram,
 		customerRepository:       customerRepo,
 		socialBindingRepository:  customerSocialRepo,
 		tradingBindingRepository: customerTradingRepo,

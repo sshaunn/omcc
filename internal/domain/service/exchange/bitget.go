@@ -37,7 +37,7 @@ func (b *Client) GetCustomerInfo(ctx context.Context, uid string) (string, error
 	return b.BitgetApiClient.Post(b.config.CustomerList, params)
 }
 
-func (b *Client) getCustomerVolumeList(ctx context.Context, uid string) (string, error) {
+func (b *Client) GetCustomerVolumeList(ctx context.Context, uid string) (string, error) {
 	currentDate := util.CurrentDateToEpoch()
 	firstDateInCurrentMonth := util.FirstDateInCurrentMonthToEpoch()
 	params := map[string]string{
@@ -51,5 +51,5 @@ func (b *Client) getCustomerVolumeList(ctx context.Context, uid string) (string,
 		logger.String("endpoint", b.config.CustomerList),
 		logger.Any("params", params))
 
-	return b.BitgetApiClient.Post(b.config.CustomerList, params)
+	return b.BitgetApiClient.Post(b.config.CustomerTradeVolume, params)
 }

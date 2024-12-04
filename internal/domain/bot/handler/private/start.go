@@ -1,7 +1,8 @@
-package handler
+package private
 
 import (
 	tele "gopkg.in/telebot.v3"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 )
 
@@ -14,5 +15,5 @@ func NewStartCommand(log logger.Logger) StartCommand {
 }
 
 func (h *StartCommand) Handle(c tele.Context) error {
-	return c.Send("欢迎使用！输入 /help 查看可用命令。")
+	return c.Send(common.WelcomeMessage)
 }

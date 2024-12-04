@@ -6,11 +6,11 @@ import (
 )
 
 type Bot interface {
-	// Start 启动机器人
+	// Start bot
 	Start(ctx context.Context) error
-	// Stop 停止机器人
+	// Stop bot
 	Stop()
-	// SendMessage 发送消息
+	// SendMessage send telegram message
 	SendMessage(ctx context.Context, chatID int64, message string) error
 }
 

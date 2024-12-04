@@ -32,6 +32,7 @@ type TelegramConfig struct {
 	Token      string        `mapstructure:"token" env:"TELEGRAM_BOT_TOKEN"`
 	WebhookURL string        `mapstructure:"webhookUrl" env:"TELEGRAM_WEBHOOK_URL"`
 	Timeout    time.Duration `mapstructure:"timeout"`
+	Group      string        `mapstructure:"group"`
 }
 
 type BitgetConfig struct {

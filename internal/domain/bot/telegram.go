@@ -6,7 +6,8 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"log"
 	"ohmycontrolcenter.tech/omcc/internal/api/middleware"
-	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler"
+	"ohmycontrolcenter.tech/omcc/internal/common"
+	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler/private"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
@@ -89,18 +90,22 @@ func (t *TelegramBot) registerHandlers() {
 
 	bitgetClient := exchange.NewBitgetClient(&t.cfg.Bitget, t.log)
 	verifyService := service.NewVerifyService(t.cfg, bitgetClient, t.log)
+	volumeService := service.NewVolumeService(bitgetClient, t.log)
 
-	verifyCommand := handler.NewVerifyCommand(t.log, *verifyService)
-	startCommand := handler.NewStartCommand(t.log)
-	helpCommand := handler.NewHelpCommand(t.log)
-	onTextCommand := handler.NewOnTextCommand(t.log)
+	verifyCommand := private.NewVerifyCommand(t.bot, t.log, *verifyService)
+	volumeCommand := private.NewVolumeCommand(t.log, *volumeService)
+	startCommand := private.NewStartCommand(t.log)
+	helpCommand := private.NewHelpCommand(t.log)
+	onTextCommand := private.NewOnTextCommand(t.log)
 
 	// register /start command
-	t.bot.Handle("/start", middlewareHandler(startCommand.Handle))
+	t.bot.Handle(common.StartCommandName, middlewareHandler(startCommand.Handle))
 	// register /help command
-	t.bot.Handle("/help", middlewareHandler(helpCommand.Handle))
+	t.bot.Handle(common.HelpCommandName, middlewareHandler(helpCommand.Handle))
 	// register /verify command
-	t.bot.Handle("/verify", middlewareHandler(verifyCommand.Handle))
+	t.bot.Handle(common.VerifyCommandName, middlewareHandler(verifyCommand.Handle))
+	// register /volume command
+	t.bot.Handle(common.VolumeCommandName, middlewareHandler(volumeCommand.Handle))
 	// processing non-command text message
 	t.bot.Handle(tele.OnText, middlewareHandler(onTextCommand.Handle))
 }

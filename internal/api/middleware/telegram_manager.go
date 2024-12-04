@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	tele "gopkg.in/telebot.v3"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/pkg/exception"
 	"time"
@@ -117,7 +118,7 @@ func (m *Manager) TelegramMiddleware(next tele.HandlerFunc) tele.HandlerFunc {
 	return func(c tele.Context) error {
 		msgInfo := createTelegramMessageInfo(c)
 
-		// 处理聊天类型
+		// processing chat type
 		if !m.handleChatType(msgInfo) {
 			return nil
 		}
@@ -130,7 +131,7 @@ func (m *Manager) TelegramMiddleware(next tele.HandlerFunc) tele.HandlerFunc {
 			defer func() {
 				if r := recover(); r != nil {
 					m.logPanic(r, msgInfo, time.Since(start))
-					err = c.Send("系统发生错误，请稍后重试")
+					err = c.Send(common.InternalServerErrorMessage)
 				}
 			}()
 			err = next(c)
