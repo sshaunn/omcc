@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS customers (
     id VARCHAR(36) PRIMARY KEY NOT NULL,
     username VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_username (username)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 --
 CREATE TABLE IF NOT EXISTS social_platforms (
@@ -14,9 +13,9 @@ CREATE TABLE IF NOT EXISTS social_platforms (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 --
 INSERT INTO social_platforms (name)
-VALUES ("TELEGRAM");
+VALUES ('TELEGRAM');
 INSERT INTO social_platforms (name)
-VALUES ("LINE");
+VALUES ('LINE');
 --
 CREATE TABLE IF NOT EXISTS trading_platforms (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,9 +24,9 @@ CREATE TABLE IF NOT EXISTS trading_platforms (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 --
 INSERT INTO trading_platforms (name)
-VALUES ("BITGET");
+VALUES ('BITGET');
 INSERT INTO trading_platforms (name)
-VALUES ("BINGX");
+VALUES ('BINGX');
 --
 CREATE TABLE IF NOT EXISTS customer_social_bindings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -39,6 +38,7 @@ CREATE TABLE IF NOT EXISTS customer_social_bindings (
     lastname VARCHAR(50),
     is_active BOOLEAN DEFAULT TRUE,
     deactivated_at TIMESTAMP NULL,
+    member_status ENUM('creator', 'administrator', 'member', 'restricted', 'left', 'kicked'),
     status ENUM('normal', 'whitelisted', 'blacklisted') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

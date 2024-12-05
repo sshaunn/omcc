@@ -29,10 +29,16 @@ type ServerConfig struct {
 }
 
 type TelegramConfig struct {
-	Token      string        `mapstructure:"token" env:"TELEGRAM_BOT_TOKEN"`
-	WebhookURL string        `mapstructure:"webhookUrl" env:"TELEGRAM_WEBHOOK_URL"`
-	Timeout    time.Duration `mapstructure:"timeout"`
-	Group      string        `mapstructure:"group"`
+	Token           string        `mapstructure:"token" env:"TELEGRAM_BOT_TOKEN"`
+	WebhookURL      string        `mapstructure:"webhookUrl" env:"TELEGRAM_WEBHOOK_URL"`
+	Timeout         time.Duration `mapstructure:"timeout"`
+	Group           string        `mapstructure:"group"`
+	MonitoredGroups []int64       `mapstructure:"monitored_groups"`
+	MonitoredTopics []int         `mapstructure:"monitored_topics"`
+	CommandPatterns []string      `mapstructure:"command_patterns"`
+	SendWarning     bool          `mapstructure:"send_warning"`
+	WarningDuration int           `mapstructure:"warning_duration"`
+	Port            string        `mapstructure:"port"`
 }
 
 type BitgetConfig struct {

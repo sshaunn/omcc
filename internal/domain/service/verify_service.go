@@ -148,16 +148,17 @@ func buildBitgetTradingPlatform() *model.TradingPlatform {
 
 func buildSocialBinding(userInfo *common.UserInfo, customer *model.Customer) *model.CustomerSocialBinding {
 	return &model.CustomerSocialBinding{
-		CustomerID: customer.Id,
-		SocialID:   common.Telegram.Value(),
-		UserID:     userInfo.UserId,
-		Username:   userInfo.Username,
-		Firstname:  userInfo.Firstname,
-		Lastname:   userInfo.Lastname,
-		IsActive:   true,
-		Status:     common.Normal,
-		Customer:   customer,
-		Platform:   buildTelegramSocialPlatform(),
+		CustomerID:   customer.Id,
+		SocialID:     common.Telegram.Value(),
+		UserID:       userInfo.UserId,
+		Username:     userInfo.Username,
+		Firstname:    userInfo.Firstname,
+		Lastname:     userInfo.Lastname,
+		IsActive:     true,
+		MemberStatus: userInfo.MemberStatus,
+		Status:       common.Normal,
+		Customer:     customer,
+		Platform:     buildTelegramSocialPlatform(),
 	}
 }
 

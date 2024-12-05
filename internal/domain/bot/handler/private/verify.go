@@ -14,7 +14,7 @@ import (
 )
 
 type VerifyCommand struct {
-	//log           logger.Logger
+	log logger.Logger
 	bot *tele.Bot
 	BaseCommand
 	verifyService service.VerifyService
@@ -38,7 +38,9 @@ func (h *VerifyCommand) Handle(c tele.Context) error {
 		return err
 	}
 
-	userInfo := h.buildUserInfoContext(c, uid)
+	m, _ := h.bot.ChatMemberOf(&tele.Chat{ID: c.Chat().ID}, &tele.User{ID: c.Sender().ID})
+
+	userInfo := h.buildUserInfoContext(c, uid, m.Role)
 	if err = h.sendProcessingMessage(c, common.ProcessingMessage); err != nil {
 		return err
 	}

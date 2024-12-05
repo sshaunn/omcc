@@ -14,5 +14,5 @@ func NewOnTextCommand(log logger.Logger) OnTextCommand {
 }
 
 func (h *OnTextCommand) Handle(c tele.Context) error {
-	return c.Send("我不是聊天机器人 有活人不聊 你找我干啥 我能跳舞吗 输入指令我才干活 不然我骂街了")
+	return c.Send("我不是聊天機器人 有活人不聊 你找我幹啥 我能跳舞嗎 輸入指令我才幹活 不然我會罵街的")
 }

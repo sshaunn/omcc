@@ -44,13 +44,14 @@ func (b *BaseCommand) validateUidInput(c tele.Context, command string) (string, 
 	return b.validator.validateUidInput(c, command)
 }
 
-func (b *BaseCommand) buildUserInfoContext(c tele.Context, uid string) *common.UserInfo {
+func (b *BaseCommand) buildUserInfoContext(c tele.Context, uid string, memberStatus tele.MemberStatus) *common.UserInfo {
 	return &common.UserInfo{
 		UID:            uid,
 		UserId:         strconv.FormatInt(c.Chat().ID, 10),
 		Firstname:      c.Chat().FirstName,
 		Lastname:       c.Chat().LastName,
 		Username:       c.Chat().Username,
+		MemberStatus:   memberStatus,
 		SocialPlatform: common.Telegram,
 	}
 }
@@ -66,6 +67,7 @@ func (b *BaseCommand) sendProcessingMessage(c tele.Context, text string) error {
 }
 
 func (b *BaseCommand) generateInviteLinks(c tele.Context) error {
-
+	// TODO currently add in only verify.go, because of the requirements
+	// TODO add if needed
 	return nil
 }

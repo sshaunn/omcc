@@ -7,6 +7,7 @@ import (
 	"log"
 	"ohmycontrolcenter.tech/omcc/internal/api/middleware"
 	"ohmycontrolcenter.tech/omcc/internal/common"
+	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler/group"
 	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler/private"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange"
@@ -27,7 +28,7 @@ func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middlewar
 	)
 
 	webhook := &tele.Webhook{
-		Listen: ":8080",
+		Listen: cfg.Telegram.Port,
 		Endpoint: &tele.WebhookEndpoint{
 			PublicURL: cfg.Telegram.WebhookURL,
 		},
@@ -39,6 +40,11 @@ func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middlewar
 		Token:  cfg.Telegram.Token,
 		Poller: webhook,
 		//Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+		//Poller: &tele.LongPoller{
+		//	Timeout:        10 * time.Second,
+		//	AllowedUpdates: []string{"message", "callback_query"},
+		//},
+		//URL: "https://api.telegram.org",
 	}
 
 	b, err := tele.NewBot(settings)
@@ -88,6 +94,8 @@ func (t *TelegramBot) Stop() {
 func (t *TelegramBot) registerHandlers() {
 	middlewareHandler := t.middleware.TelegramMiddleware
 
+	groupHandler := group.NewGroupMessageHandler(&t.cfg.Telegram, t.bot, t.log)
+
 	bitgetClient := exchange.NewBitgetClient(&t.cfg.Bitget, t.log)
 	verifyService := service.NewVerifyService(t.cfg, bitgetClient, t.log)
 	volumeService := service.NewVolumeService(bitgetClient, t.log)
@@ -98,16 +106,32 @@ func (t *TelegramBot) registerHandlers() {
 	helpCommand := private.NewHelpCommand(t.log)
 	onTextCommand := private.NewOnTextCommand(t.log)
 
-	// register /start command
-	t.bot.Handle(common.StartCommandName, middlewareHandler(startCommand.Handle))
-	// register /help command
-	t.bot.Handle(common.HelpCommandName, middlewareHandler(helpCommand.Handle))
-	// register /verify command
-	t.bot.Handle(common.VerifyCommandName, middlewareHandler(verifyCommand.Handle))
-	// register /volume command
-	t.bot.Handle(common.VolumeCommandName, middlewareHandler(volumeCommand.Handle))
 	// processing non-command text message
-	t.bot.Handle(tele.OnText, middlewareHandler(onTextCommand.Handle))
+	t.bot.Handle(tele.OnText, middlewareHandler(handlerType(onTextCommand.Handle, groupHandler.Handle)))
+
+	// register /start command
+	t.bot.Handle(common.StartCommandName, middlewareHandler(handlerType(startCommand.Handle, groupHandler.Handle)))
+	// register /help command
+	t.bot.Handle(common.HelpCommandName, middlewareHandler(handlerType(helpCommand.Handle, groupHandler.Handle)))
+	// register /verify command
+	t.bot.Handle(common.VerifyCommandName, middlewareHandler(handlerType(verifyCommand.Handle, groupHandler.Handle)))
+	// register /volume command
+	t.bot.Handle(common.VolumeCommandName, middlewareHandler(handlerType(volumeCommand.Handle, groupHandler.Handle)))
+
+}
+
+func handlerType(handlerFunc ...tele.HandlerFunc) middleware.Handler {
+	if len(handlerFunc) < 2 {
+		return middleware.Handler{
+			PrivateHandler: handlerFunc[0],
+		}
+	}
+	return middleware.Handler{
+		PrivateHandler:    handlerFunc[0],
+		SuperGroupHandler: handlerFunc[1],
+		DefaultHandler:    handlerFunc[1], // TODO added if needed
+	}
+
 }
 
 // SendMessage 发送消息

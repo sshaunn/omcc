@@ -1,8 +1,11 @@
 package common
 
+import tele "gopkg.in/telebot.v3"
+
 type SocialPlatformType int
 type TradingPlatformType int
 type Status string
+type MemberStatus tele.MemberStatus
 
 // Social platform constants
 const (
@@ -21,6 +24,22 @@ const (
 	Normal      Status = "normal"
 	Whitelisted        = "whitelisted"
 	Blacklisted        = "blacklisted"
+)
+
+const (
+	Creator       MemberStatus = "creator"
+	Administrator              = "administrator"
+	Member                     = "member"
+	Restricted                 = "restricted"
+	Left                       = "left"
+	Kicked                     = "kicked"
+)
+
+const (
+	Private int = iota
+	Supergroup
+	Group
+	Channel
 )
 
 func (p SocialPlatformType) Name() string {
@@ -46,5 +65,6 @@ type UserInfo struct {
 	Firstname      string
 	Lastname       string
 	Username       string
+	MemberStatus   tele.MemberStatus
 	SocialPlatform SocialPlatformType
 }

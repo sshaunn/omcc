@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm"
 	"ohmycontrolcenter.tech/omcc/internal/common"
 	"time"
@@ -27,20 +28,21 @@ type TradingPlatform struct {
 }
 
 type CustomerSocialBinding struct {
-	ID            int64           `gorm:"primaryKey;autoIncrement" json:"id"`
-	CustomerID    string          `gorm:"type:varchar(36)" json:"customer_id"`
-	SocialID      int             `gorm:"type:int" json:"social_id"`
-	UserID        string          `gorm:"type:varchar(50)" json:"user_id"`
-	Username      string          `gorm:"type:varchar(50)" json:"username"`
-	Firstname     string          `gorm:"type:varchar(50)" json:"firstname"`
-	Lastname      string          `gorm:"type:varchar(50)" json:"lastname"`
-	IsActive      bool            `gorm:"default:true" json:"is_active"`
-	DeactivatedAt *time.Time      `json:"deactivated_at"`
-	Status        common.Status   `gorm:"type:enum('normal','whitelisted','blacklisted')" json:"status"`
-	CreatedAt     time.Time       `json:"created_at"`
-	UpdatedAt     time.Time       `json:"updated_at"`
-	Customer      *Customer       `gorm:"foreignKey:CustomerID" json:"-"`
-	Platform      *SocialPlatform `gorm:"foreignKey:SocialID" json:"-"`
+	ID            int64             `gorm:"primaryKey;autoIncrement" json:"id"`
+	CustomerID    string            `gorm:"type:varchar(36)" json:"customer_id"`
+	SocialID      int               `gorm:"type:int" json:"social_id"`
+	UserID        string            `gorm:"type:varchar(50)" json:"user_id"`
+	Username      string            `gorm:"type:varchar(50)" json:"username"`
+	Firstname     string            `gorm:"type:varchar(50)" json:"firstname"`
+	Lastname      string            `gorm:"type:varchar(50)" json:"lastname"`
+	IsActive      bool              `gorm:"default:true" json:"is_active"`
+	DeactivatedAt *time.Time        `json:"deactivated_at"`
+	MemberStatus  tele.MemberStatus `gorm:"type:enum('creator', 'administrator', 'member', 'restricted', 'left', 'kicked')" json:"member_status"`
+	Status        common.Status     `gorm:"type:enum('normal','whitelisted','blacklisted')" json:"status"`
+	CreatedAt     time.Time         `json:"created_at"`
+	UpdatedAt     time.Time         `json:"updated_at"`
+	Customer      *Customer         `gorm:"foreignKey:CustomerID" json:"-"`
+	Platform      *SocialPlatform   `gorm:"foreignKey:SocialID" json:"-"`
 }
 
 type CustomerTradingBinding struct {

@@ -52,19 +52,3 @@ func (v *VolumeCommand) handleResponse(c tele.Context, err error, args ...interf
 	}
 	return c.Send(fmt.Sprintf(common.SuccessVolumeReplyMessage, volume))
 }
-
-//// sendResponse 发送响应
-//func (h *VerifyCommand) sendResponse(c tele.Context, err error, uid string, userInfo *common.UserInfo) error {
-//	if err != nil {
-//		h.log.Info("uid verification failed",
-//			logger.String("uid", uid),
-//			logger.Any("userInfo", userInfo),
-//		)
-//		return c.Send(fmt.Sprintf("❌ UID %s 验证失败，该 UID 无效。", uid))
-//	}
-//
-//	h.log.Info("processing verify command success",
-//		logger.String("uid", uid))
-//	return c.Send(fmt.Sprintf("✅ UID %s 验证成功！", uid))
-//
-//}

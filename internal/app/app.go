@@ -44,9 +44,15 @@ func (a *App) Start() error {
 	a.log.Info("starting application")
 
 	// 启动 bot
-	if err := a.bot.Start(a.ctx); err != nil {
-		return err
-	}
+	//if err := a.bot.Start(a.ctx); err != nil {
+	//	return err
+	//}
+	go func() {
+		err := a.bot.Start(a.ctx)
+		if err != nil {
+			a.log.Info("starting application failed")
+		}
+	}()
 
 	a.log.Info("application started successfully")
 	return nil

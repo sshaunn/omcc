@@ -75,3 +75,7 @@ const (
 	SuccessVolumeReplyMessage string = `🔎查詢成功,距離本月1號到今日,您的交易額為: USDT$%.2f`
 	FailureVolumeReplyMessage        = `❌查詢失敗請重試`
 )
+
+const (
+	UserWarningMessage string = "⚠️ @%s 請不要在群組中發送任何与指令 电报链接 网页链接 UID...等等敏感訊息 謝謝合作"
+)

@@ -14,6 +14,12 @@ type Manager struct {
 	log logger.Logger
 }
 
+type Handler struct {
+	PrivateHandler    tele.HandlerFunc
+	SuperGroupHandler tele.HandlerFunc
+	DefaultHandler    tele.HandlerFunc
+}
+
 func NewManager(log logger.Logger) *Manager {
 	return &Manager{
 		log: log,
@@ -42,16 +48,34 @@ func createTelegramMessageInfo(c tele.Context) MessageInfo {
 	}
 }
 
-func (m *Manager) handleChatType(messageInfo MessageInfo) bool {
-	switch messageInfo.chatType {
+func (m *Manager) getHandlerForChatType(handlers Handler, chatType tele.ChatType) tele.HandlerFunc {
+	m.log.Info("getting handler for chat type",
+		logger.String("chat_type", string(chatType)),
+		logger.Any("has_private_handler", handlers.PrivateHandler != nil),
+		logger.Any("has_supergroup_handler", handlers.SuperGroupHandler != nil),
+	)
+	switch chatType {
 	case tele.ChatPrivate:
-		m.log.Info("received telegram private message", messageInfo.fields...)
-		return true
+		return handlers.PrivateHandler
+	case tele.ChatSuperGroup:
+		return handlers.SuperGroupHandler
 	default:
-		m.log.Info(fmt.Sprintf("received telegram %s message", messageInfo.chatType),
-			messageInfo.fields...)
-		return false
+		return handlers.DefaultHandler
 	}
+}
+
+func (m *Manager) logReceived(msgInfo MessageInfo) {
+	var msgType string
+	switch msgInfo.chatType {
+	case tele.ChatPrivate:
+		msgType = "private"
+	case tele.ChatSuperGroup:
+		msgType = "supergroup"
+	default:
+		msgType = string(msgInfo.chatType)
+	}
+
+	m.log.Info(fmt.Sprintf("received telegram %s message", msgType), msgInfo.fields...)
 }
 
 // handleError 处理错误并记录日志
@@ -114,12 +138,16 @@ func (m *Manager) logPanic(r interface{}, msgInfo MessageInfo, duration time.Dur
 }
 
 // TelegramMiddleware 统一的 Telegram 中间件
-func (m *Manager) TelegramMiddleware(next tele.HandlerFunc) tele.HandlerFunc {
+func (m *Manager) TelegramMiddleware(handlers Handler) tele.HandlerFunc {
 	return func(c tele.Context) error {
 		msgInfo := createTelegramMessageInfo(c)
 
-		// processing chat type
-		if !m.handleChatType(msgInfo) {
+		// 记录收到的消息
+		m.logReceived(msgInfo)
+
+		// 获取对应聊天类型的处理器
+		handler := m.getHandlerForChatType(handlers, c.Chat().Type)
+		if handler == nil {
 			return nil
 		}
 
@@ -134,7 +162,7 @@ func (m *Manager) TelegramMiddleware(next tele.HandlerFunc) tele.HandlerFunc {
 					err = c.Send(common.InternalServerErrorMessage)
 				}
 			}()
-			err = next(c)
+			err = handler(c)
 		}()
 
 		return m.handleError(err, c, msgInfo, time.Since(start))
