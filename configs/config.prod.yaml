@@ -43,14 +43,6 @@ database:
   max_idle_connections: 10
   max_open_connections: 100
   max_lifetime: "1h"
-#  host: localhost
-#  port: 3306
-#  user: user
-#  password: pass
-#  database: "omcc"
-#  max_idle_connections: 10
-#  max_open_connections: 100
-#  max_lifetime: "1h"
 
 #redis:
 #  addr: "localhost:6379"

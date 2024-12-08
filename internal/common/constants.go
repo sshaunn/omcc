@@ -14,6 +14,13 @@ const (
 	BitgetApiPassphraseEnvPath        = "exchange.bitget.passphrase"
 )
 
+const (
+	DatabaseHostEnvPath     string = "database.host"
+	DatabasePortEnvPath            = "database.port"
+	DatabaseUserEnvPath            = "database.user"
+	DatabasePasswordEnvPath        = "database.password"
+)
+
 // Social platform constants
 const (
 	_ SocialPlatformType = iota

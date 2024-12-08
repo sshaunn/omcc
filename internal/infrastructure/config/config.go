@@ -64,10 +64,10 @@ type BitgetConfig struct {
 }
 
 type DatabaseConfig struct {
-	Host               string        `mapstructure:"host"`
-	Port               int           `mapstructure:"port"`
-	User               string        `mapstructure:"user"`
-	Password           string        `mapstructure:"password"`
+	Host               string        `mapstructure:"host" env:"POLAR_DATABASE_HOST"`
+	Port               int           `mapstructure:"port" env:"POLAR_DATABASE_PORT"`
+	User               string        `mapstructure:"user" env:"POLAR_DATABASE_USER"`
+	Password           string        `mapstructure:"password" env:"POLAR_DATABASE_PASSWORD"`
 	Database           string        `mapstructure:"database"`
 	MaxIdleConnections int           `mapstructure:"max_idle_connections"`
 	MaxOpenConnections int           `mapstructure:"max_open_connections"`
@@ -98,6 +98,9 @@ func NewConfig(configPath string) (*Config, error) {
 	}
 
 	loadSensitiveConfig()
+	if env == "prod" {
+		loadDatabaseSensitiveConfig()
+	}
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
@@ -118,4 +121,12 @@ func loadSensitiveConfig() {
 	viper.Set(common.BitgetApiKeyEnvPath, os.Getenv("BITGET_API_KEY"))
 	viper.Set(common.BitgetApiSecretKeyEnvPath, os.Getenv("BITGET_SECRET_KEY"))
 	viper.Set(common.BitgetApiPassphraseEnvPath, os.Getenv("BITGET_PASSPHRASE"))
+}
+
+func loadDatabaseSensitiveConfig() {
+	// Database config
+	viper.Set(common.DatabaseHostEnvPath, os.Getenv("POLAR_DATABASE_HOST"))
+	viper.Set(common.DatabasePortEnvPath, os.Getenv("POLAR_DATABASE_PORT"))
+	viper.Set(common.DatabaseUserEnvPath, os.Getenv("POLAR_DATABASE_USER"))
+	viper.Set(common.DatabasePasswordEnvPath, os.Getenv("POLAR_DATABASE_PASSWORD"))
 }
