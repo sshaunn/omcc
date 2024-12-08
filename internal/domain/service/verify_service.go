@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"ohmycontrolcenter.tech/omcc/internal/common"
@@ -11,25 +10,18 @@ import (
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange/bitget"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/database"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/repository"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"ohmycontrolcenter.tech/omcc/util"
-)
-
-var (
-	ErrInvalidUID         = errors.New("invalid UID format")
-	ErrUIDNotFound        = errors.New("UID not found")
-	ErrServiceUnavailable = errors.New("verification service unavailable")
-	ErrDatabaseError      = errors.New("database query execution error")
 )
 
 type VerifyService struct {
 	client                   *exchange.Client
 	db                       *gorm.DB
 	Cfg                      *config.TelegramConfig
-	customerRepository       *repository.CustomerRepository
-	socialBindingRepository  *repository.CustomerSocialBindingRepository
-	tradingBindingRepository *repository.CustomerTradingBindingRepository
+	customerRepository       repository.CustomerRepository
+	socialBindingRepository  repository.CustomerSocialBindingRepository
+	tradingBindingRepository repository.CustomerTradingBindingRepository
 	log                      logger.Logger
 }
 
@@ -50,13 +42,12 @@ func NewVerifyService(cfg *config.Config, client *exchange.Client, log logger.Lo
 	}
 }
 
-func (v *VerifyService) HandleVerification(ctx context.Context, uid string) error {
+func (v *VerifyService) HandleVerification(ctx context.Context, uid string, userInfo *common.UserInfo) error {
 
 	result, err := v.getValidResultByUid(ctx, uid)
 	if err != nil {
 		return err
 	}
-	userInfo := ctx.Value("userInfo").(*common.UserInfo)
 	customerId := uuid.New().String()
 	customer := &model.Customer{
 		Id: customerId,
@@ -93,7 +84,7 @@ func (v *VerifyService) getValidResultByUid(ctx context.Context, uid string) (*b
 			logger.String("uid", uid),
 			logger.Error(err),
 		)
-		return nil, ErrServiceUnavailable
+		return nil, repository.ErrServiceUnavailable
 	}
 	v.log.Info("Completed invoking bitget getCustomerList api by user uid",
 		logger.String("uid", uid),
@@ -111,8 +102,6 @@ func (v *VerifyService) getValidResultByUid(ctx context.Context, uid string) (*b
 }
 
 func (v *VerifyService) getValidResult(response string, uid string) (*bitget.CustomerInfo, error) {
-	//var result bitget.BaseResponse[[]bitget.CustomerInfo]
-	//if result, err := json.Unmarshal([]byte(response), &result); err != nil {
 
 	result, err := util.UnmarshalSafe[bitget.BaseResponse[[]bitget.CustomerInfo]]([]byte(response))
 	if err != nil {
@@ -121,11 +110,11 @@ func (v *VerifyService) getValidResult(response string, uid string) (*bitget.Cus
 			logger.Error(err),
 			logger.String("response", response),
 		)
-		return nil, ErrServiceUnavailable
+		return nil, repository.ErrServiceUnavailable
 	}
 
 	if len(result.Data) == 0 {
-		return nil, ErrUIDNotFound
+		return nil, repository.ErrUIDNotFound
 	}
 
 	return &result.Data[0], nil
@@ -164,7 +153,7 @@ func buildSocialBinding(userInfo *common.UserInfo, customer *model.Customer) *mo
 
 func buildTradingBinding(userInfo *common.UserInfo, customer *model.Customer, customerInfo *bitget.CustomerInfo) *model.CustomerTradingBinding {
 
-	registerTime, _ := util.ToIsoTimeFormat(customerInfo.RegisterTime)
+	registerTime, _ := util.ToIsoTimeStringFormat(customerInfo.RegisterTime)
 
 	return &model.CustomerTradingBinding{
 		CustomerID:   customer.Id,

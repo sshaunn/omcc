@@ -5,7 +5,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"regexp"
 	"time"
 )
@@ -33,16 +33,15 @@ func NewGroupMessageHandler(cfg *config.TelegramConfig, bot *tele.Bot, log logge
 func (h *MessageHandler) Handle(c tele.Context) error {
 	message := c.Message()
 	logFields := []logger.Field{
-		logger.String("text", c.Text()),
-		logger.String("chat_type", string(c.Chat().Type)),
-		logger.Int64("chat_id", c.Chat().ID),
+		logger.Any("Sender", c.Sender()),
+		logger.Any("Chat", c.Chat()),
 	}
 
 	if message.ThreadID != 0 {
 		logFields = append(logFields, logger.String("thread_id", fmt.Sprintf("%d", message.ThreadID)))
 	}
 
-	h.log.Info("Handling group message", logFields...)
+	h.log.Info("Start handling group message", logFields...)
 
 	if !h.shouldProcessMessage(c) {
 		return nil

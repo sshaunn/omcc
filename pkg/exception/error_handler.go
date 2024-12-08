@@ -4,9 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"ohmycontrolcenter.tech/omcc/internal/common"
-	"ohmycontrolcenter.tech/omcc/internal/domain/service"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/repository"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type ErrorHandler struct {
@@ -20,12 +19,17 @@ func NewErrorHandler(log logger.Logger) *ErrorHandler {
 // HandleServiceError error handler
 func (h *ErrorHandler) HandleServiceError(err error, context map[string]interface{}) *CommandError {
 	switch {
-	case errors.Is(err, service.ErrUIDNotFound):
+	case errors.Is(err, repository.ErrInvalidUID):
 		return &CommandError{
 			Message: fmt.Sprintf(common.InvalidUidVerifyReplyMessage),
 			Type:    ErrInvalidFormat,
 		}
-	case errors.Is(err, service.ErrServiceUnavailable):
+	case errors.Is(err, repository.ErrUIDNotFound):
+		return &CommandError{
+			Message: fmt.Sprintf(common.InvalidUidVerifyReplyMessage),
+			Type:    ErrInvalidFormat,
+		}
+	case errors.Is(err, repository.ErrServiceUnavailable):
 		return &CommandError{
 			Message: common.ServerErrorMessage,
 			Type:    ErrServiceUnavailable,
@@ -43,6 +47,16 @@ func (h *ErrorHandler) HandleServiceError(err error, context map[string]interfac
 	case errors.Is(err, repository.ErrTradingBindingExists):
 		return &CommandError{
 			Message: common.ExistsUidVerifyReplyMessage,
+			Type:    ErrInvalidFormat,
+		}
+	case errors.Is(err, repository.ErrRecordNotFound):
+		return &CommandError{
+			Message: fmt.Sprintf(common.InvalidUidVerifyReplyMessage),
+			Type:    ErrInvalidFormat,
+		}
+	case errors.Is(err, repository.ErrDuplicatedSocialUserError):
+		return &CommandError{
+			Message: fmt.Sprintf(common.DuplicatedUserReplyMessage),
 			Type:    ErrInvalidFormat,
 		}
 	default:

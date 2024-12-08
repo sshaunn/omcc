@@ -6,7 +6,7 @@ import (
 	"ohmycontrolcenter.tech/omcc/internal/api/middleware"
 	"ohmycontrolcenter.tech/omcc/internal/domain/bot"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type App struct {

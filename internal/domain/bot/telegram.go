@@ -12,7 +12,7 @@ import (
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type TelegramBot struct {
@@ -96,14 +96,18 @@ func (t *TelegramBot) registerHandlers() {
 
 	groupHandler := group.NewGroupMessageHandler(&t.cfg.Telegram, t.bot, t.log)
 
-	bitgetClient := exchange.NewBitgetClient(&t.cfg.Bitget, t.log)
+	bitgetClient := exchange.NewBitgetClient(&t.cfg.Exchange.BitgetConfig, t.log)
 	verifyService := service.NewVerifyService(t.cfg, bitgetClient, t.log)
-	volumeService := service.NewVolumeService(bitgetClient, t.log)
+	volumeService := service.NewVolumeService(&t.cfg.Database, bitgetClient, t.log)
+	checkService := service.NewStatusService(t.cfg, t.log)
+	accountService := service.NewAccountService(t.cfg, t.log)
 
 	verifyCommand := private.NewVerifyCommand(t.bot, t.log, *verifyService)
 	volumeCommand := private.NewVolumeCommand(t.log, *volumeService)
 	startCommand := private.NewStartCommand(t.log)
+	checkCommand := private.NewCheckCommand(t.log, *checkService)
 	helpCommand := private.NewHelpCommand(t.log)
+	accountCommand := private.NewAccountCommand(t.bot, t.log, *accountService)
 	onTextCommand := private.NewOnTextCommand(t.log)
 
 	// processing non-command text message
@@ -117,6 +121,10 @@ func (t *TelegramBot) registerHandlers() {
 	t.bot.Handle(common.VerifyCommandName, middlewareHandler(handlerType(verifyCommand.Handle, groupHandler.Handle)))
 	// register /volume command
 	t.bot.Handle(common.VolumeCommandName, middlewareHandler(handlerType(volumeCommand.Handle, groupHandler.Handle)))
+	// register /check command
+	t.bot.Handle(common.StatusCommandName, middlewareHandler(handlerType(checkCommand.Handle, groupHandler.Handle)))
+	// register /account command
+	t.bot.Handle(common.AccountCommandName, middlewareHandler(handlerType(accountCommand.Handle, groupHandler.Handle)))
 
 }
 

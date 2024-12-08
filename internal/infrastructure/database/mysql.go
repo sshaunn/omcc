@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
-	log "ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	log "ohmycontrolcenter.tech/omcc/pkg/logger"
 
 	"time"
 )

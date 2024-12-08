@@ -2,7 +2,7 @@ package private
 
 import (
 	tele "gopkg.in/telebot.v3"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type OnTextCommand struct {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	tele "gopkg.in/telebot.v3"
 	"ohmycontrolcenter.tech/omcc/internal/common"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/pkg/exception"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"time"
 )
 
@@ -35,25 +35,15 @@ type MessageInfo struct {
 func createTelegramMessageInfo(c tele.Context) MessageInfo {
 	return MessageInfo{
 		fields: []logger.Field{
-			logger.Int64("chat_id", c.Chat().ID),
-			logger.String("chat_type", string(c.Chat().Type)),
-			logger.String("text", c.Text()),
-			logger.String("username", c.Sender().Username),
-			logger.String("first_name", c.Sender().FirstName),
-			logger.String("last_name", c.Sender().LastName),
-			logger.Int64("user_id", c.Sender().ID),
-			logger.Any("message_id", c.Message().ID),
+			logger.Any("Chat", c.Chat()),
+			logger.Any("Sender", c.Sender()),
+			logger.Any("Recipient", c.Recipient()),
 		},
 		chatType: c.Chat().Type,
 	}
 }
 
 func (m *Manager) getHandlerForChatType(handlers Handler, chatType tele.ChatType) tele.HandlerFunc {
-	m.log.Info("getting handler for chat type",
-		logger.String("chat_type", string(chatType)),
-		logger.Any("has_private_handler", handlers.PrivateHandler != nil),
-		logger.Any("has_supergroup_handler", handlers.SuperGroupHandler != nil),
-	)
 	switch chatType {
 	case tele.ChatPrivate:
 		return handlers.PrivateHandler
@@ -65,17 +55,8 @@ func (m *Manager) getHandlerForChatType(handlers Handler, chatType tele.ChatType
 }
 
 func (m *Manager) logReceived(msgInfo MessageInfo) {
-	var msgType string
-	switch msgInfo.chatType {
-	case tele.ChatPrivate:
-		msgType = "private"
-	case tele.ChatSuperGroup:
-		msgType = "supergroup"
-	default:
-		msgType = string(msgInfo.chatType)
-	}
 
-	m.log.Info(fmt.Sprintf("received telegram %s message", msgType), msgInfo.fields...)
+	m.log.Info(fmt.Sprintf("Received Telegram %s message", msgInfo.chatType), msgInfo.fields...)
 }
 
 // handleError 处理错误并记录日志

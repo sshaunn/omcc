@@ -6,8 +6,8 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/pkg/exception"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"strconv"
 	"strings"
 	"sync"
@@ -40,15 +40,13 @@ func (h *VerifyCommand) Handle(c tele.Context) error {
 
 	m, _ := h.bot.ChatMemberOf(&tele.Chat{ID: c.Chat().ID}, &tele.User{ID: c.Sender().ID})
 
-	userInfo := h.buildUserInfoContext(c, uid, m.Role)
+	memberStatus := common.GetMemberStatusFromValue(m.Role)
+	userInfo := h.buildUserInfoContext(c, uid, memberStatus)
 	if err = h.sendProcessingMessage(c, common.ProcessingMessage); err != nil {
 		return err
 	}
 
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, "userInfo", userInfo)
-
-	err = h.verifyService.HandleVerification(ctx, uid)
+	err = h.verifyService.HandleVerification(context.TODO(), uid, userInfo)
 	return h.handleResponse(c, err, uid, userInfo)
 }
 

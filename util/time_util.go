@@ -21,12 +21,20 @@ func init() {
 
 // static functions
 
-func ToIsoTimeFormat(epochString string) (string, error) {
+func ToIsoTimeStringFormat(epochString string) (string, error) {
 	ms, err := strconv.ParseInt(epochString, 10, 64)
 	if err != nil {
 		return "", fmt.Errorf("invalid second timestamp: %v", err)
 	}
 	return time.UnixMilli(ms).In(GlobalTimeConfig.TimeLocation).Format(GlobalTimeConfig.TimeFormat), nil
+}
+
+func ToIsoTimeFormat(epochString string) (time.Time, error) {
+	ms, err := strconv.ParseInt(epochString, 10, 64)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("invalid second timestamp: %v", err)
+	}
+	return time.UnixMilli(ms).In(GlobalTimeConfig.TimeLocation), nil
 }
 
 func CurrentDate() string {
@@ -51,6 +59,14 @@ func FirstDateInCurrentMonthToEpoch() string {
 	now := time.Now().In(GlobalTimeConfig.TimeLocation)
 	firstDay := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, GlobalTimeConfig.TimeLocation)
 	return strconv.FormatInt(firstDay.UnixMilli(), 10)
+}
+
+func FirstAndLastDateOfLastMonth() (time.Time, time.Time) {
+	now := time.Now().In(GlobalTimeConfig.TimeLocation)
+	firstDayOfCurrentMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, GlobalTimeConfig.TimeLocation)
+	firstDayOfLastMonth := firstDayOfCurrentMonth.AddDate(0, -1, 0)
+	lastDayOfLastMonth := firstDayOfLastMonth.AddDate(0, 0, -1)
+	return firstDayOfLastMonth, lastDayOfLastMonth
 }
 
 // some support functions

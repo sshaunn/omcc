@@ -1,15 +1,10 @@
 app:
   name: "telegram-bot"
-  environment: "dev"
+  environment: "prod"
 
 server:
   port: "8990"
   host: "localhost"
-  fasthttp:
-    maxConnsPerHost: 100 # concurrent worker number
-    maxIdleConnDuration: 30
-    readTimeout: 5
-    writeTimeout: 5
 
 telegram:
   port: ":8080"
@@ -18,13 +13,11 @@ telegram:
   monitored_groups:
     - -1001999851882 # main chat group
     - -1001856345480 # vip chat group
-    - -1002217128790 # test chat group
   monitored_topics:
     - 39757
     - 39760
     - 43371
     - 39762
-    - 4718
   command_patterns:
     - "^/[a-zA-Z]+"
     - "^![a-zA-Z]+"
@@ -46,16 +39,20 @@ exchange:
     customer_trade_volume: "/api/broker/v1/agent/customerTradeVolumnList"
 
 database:
-  host: localhost
-  port: 3306
-  user: user
-  password: pass
   database: "omcc"
   max_idle_connections: 10
   max_open_connections: 100
   max_lifetime: "1h"
+#  host: localhost
+#  port: 3306
+#  user: user
+#  password: pass
+#  database: "omcc"
+#  max_idle_connections: 10
+#  max_open_connections: 100
+#  max_lifetime: "1h"
 
-redis:
-  addr: "localhost:6379"
-  password: ""
-  db: 0
+#redis:
+#  addr: "localhost:6379"
+#  password: ""
+#  db: 0

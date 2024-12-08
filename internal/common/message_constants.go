@@ -1,11 +1,13 @@
 package common
 
 const (
-	VerifyCommandName string = "/verify"
-	VolumeCommandName        = "/volume"
-	StartCommandName         = "/start"
-	HelpCommandName          = "/help"
-	JoinCommandName          = "/join"
+	VerifyCommandName  string = "/verify"
+	VolumeCommandName         = "/volume"
+	StartCommandName          = "/start"
+	HelpCommandName           = "/help"
+	StatusCommandName         = "/status"
+	JoinCommandName           = "/join"
+	AccountCommandName        = "/account"
 )
 const (
 	WelcomeMessage string = `🦀≡≡≡≡≡≡≡≡▷►◈◄◁≡≡≡≡≡≡≡≡🦀
@@ -69,6 +71,8 @@ const (
 	InvalidUidVerifyReplyMessage                = `🦀您輸入的UID不存在 驗證失敗❌ 請查詢正確後再次輸入`
 	ExistsUidVerifyReplyMessage                 = `🦀您要驗證的uid已存在,無須再次驗證!祝您交易順利!✅`
 	ExistsSocialUserIdVerifyReplyMessage        = `🦀您已綁定過電報帳號 請使用/account變更您的綁定電報帳號❌`
+	InvalidUidStatusMessage                     = "🦀此UID所綁定的社交帳號狀態為非活躍 請使用/volume %s 檢查您的交易額度是否達標 或聯絡群組主❌"
+	DuplicatedUserReplyMessage                  = "🦀此UID所綁定的社交帳號無需更改"
 )
 
 const (
@@ -77,5 +81,10 @@ const (
 )
 
 const (
-	UserWarningMessage string = "⚠️ @%s 請不要在群組中發送任何与指令 电报链接 网页链接 UID...等等敏感訊息 謝謝合作"
+	MemberStatusReplyMessage string = "⚠️ 您目前使用該uid: %s 查詢的電報用戶群組狀態為： %s"
+	MemberInfoUpdatedMessage        = "🦀您目前的社交帳號資訊已更新成功✅"
+)
+
+const (
+	UserWarningMessage string = "⚠️ @%s 請不要在群組中發送任何与指令 電報链接 網頁連結 UID...等等敏感訊息 謝謝合作"
 )

@@ -7,8 +7,8 @@ import (
 	"math/big"
 	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
 	"ohmycontrolcenter.tech/omcc/pkg/exception"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type VolumeCommand struct {

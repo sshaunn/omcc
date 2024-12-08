@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"os"
 	"time"
 )
@@ -12,7 +13,7 @@ type Config struct {
 	App        AppConfig      `mapstructure:"app"`
 	Telegram   TelegramConfig `mapstructure:"telegram"`
 	Server     ServerConfig   `mapstructure:"server"`
-	Bitget     BitgetConfig   `mapstructure:"exchange"`
+	Exchange   Exchange       `mapstructure:"exchange"`
 	Database   DatabaseConfig `mapstructure:"database"`
 	TimeFormat TimeFormatConfig
 	// TODO redis
@@ -24,8 +25,16 @@ type AppConfig struct {
 }
 
 type ServerConfig struct {
-	Port string `mapstructure:"port"`
-	Host string `mapstructure:"host"`
+	Port     string          `mapstructure:"port"`
+	Host     string          `mapstructure:"host"`
+	Fasthttp *FasthttpConfig `mapstructure:"fasthttp"`
+}
+
+type FasthttpConfig struct {
+	MaxConnsPerHost     int           `mapstructure:"maxConnsPerHost"`
+	MaxIdleConnDuration time.Duration `mapstructure:"maxIdleConnDuration"`
+	ReadTimeout         time.Duration `mapstructure:"readTimeout"`
+	WriteTimeout        time.Duration `mapstructure:"writeTimeout"`
 }
 
 type TelegramConfig struct {
@@ -41,10 +50,15 @@ type TelegramConfig struct {
 	Port            string        `mapstructure:"port"`
 }
 
+type Exchange struct {
+	BitgetConfig `mapstructure:"bitget"`
+}
+
 type BitgetConfig struct {
 	ApiKey              string `mapstructure:"apiKey" env:"BITGET_API_KEY"`
 	SecretKey           string `mapstructure:"secretKey" env:"BITGET_SECRET_KEY"`
 	Passphrase          string `mapstructure:"passphrase" env:"BITGET_PASSPHRASE"`
+	BaseUrl             string `mapstructure:"baseUrl"`
 	CustomerList        string `mapstructure:"customer_list"`
 	CustomerTradeVolume string `mapstructure:"customer_trade_volume"`
 }
@@ -101,7 +115,7 @@ func loadSensitiveConfig() {
 	viper.Set("telegram.botName", os.Getenv("TELEGRAM_BOT_NAME"))
 
 	// Bitget config
-	viper.Set("exchange.apiKey", os.Getenv("BITGET_API_KEY"))
-	viper.Set("exchange.secretKey", os.Getenv("BITGET_SECRET_KEY"))
-	viper.Set("exchange.passphrase", os.Getenv("BITGET_PASSPHRASE"))
+	viper.Set(common.BitgetApiKeyEnvPath, os.Getenv("BITGET_API_KEY"))
+	viper.Set(common.BitgetApiSecretKeyEnvPath, os.Getenv("BITGET_SECRET_KEY"))
+	viper.Set(common.BitgetApiPassphraseEnvPath, os.Getenv("BITGET_PASSPHRASE"))
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"ohmycontrolcenter.tech/omcc/internal/app"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
-	"ohmycontrolcenter.tech/omcc/internal/infrastructure/logger"
+	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"os"
 	"os/signal"
 	"syscall"
