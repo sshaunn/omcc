@@ -13,7 +13,6 @@ import (
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
-	"time"
 )
 
 type TelegramBot struct {
@@ -28,24 +27,24 @@ func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middlewar
 		logger.String("webhook_url", cfg.Telegram.WebhookURL),
 	)
 
-	//webhook := &tele.Webhook{
-	//	Listen: cfg.Telegram.Port,
-	//	Endpoint: &tele.WebhookEndpoint{
-	//		PublicURL: cfg.Telegram.WebhookURL,
-	//	},
-	//	AllowedUpdates: []string{"message", "callback_query"},
-	//	MaxConnections: 40,
-	//}
+	webhook := &tele.Webhook{
+		Listen: cfg.Telegram.Port,
+		Endpoint: &tele.WebhookEndpoint{
+			PublicURL: cfg.Telegram.WebhookURL,
+		},
+		AllowedUpdates: []string{"message", "callback_query"},
+		MaxConnections: 40,
+	}
 
 	settings := tele.Settings{
-		Token: cfg.Telegram.Token,
-		//Poller: webhook,
+		Token:  cfg.Telegram.Token,
+		Poller: webhook,
 		//Poller: &tele.LongPoller{Timeout: 10 * time.Second},
-		Poller: &tele.LongPoller{
-			Timeout:        10 * time.Second,
-			AllowedUpdates: []string{"message", "callback_query"},
-		},
-		URL: "https://api.telegram.org",
+		//Poller: &tele.LongPoller{
+		//	Timeout:        10 * time.Second,
+		//	AllowedUpdates: []string{"message", "callback_query"},
+		//},
+		//URL: "https://api.telegram.org",
 	}
 
 	b, err := tele.NewBot(settings)
