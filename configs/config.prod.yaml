@@ -7,7 +7,7 @@ server:
   host: "localhost"
 
 telegram:
-  port: ":8080"
+  port: ":8989"
   timeout: "10s"
   group: -1001999851882,-1001856345480
   monitored_groups:
