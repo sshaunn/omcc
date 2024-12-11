@@ -25,9 +25,11 @@ type AppConfig struct {
 }
 
 type ServerConfig struct {
-	Port     string          `mapstructure:"port"`
-	Host     string          `mapstructure:"host"`
-	Fasthttp *FasthttpConfig `mapstructure:"fasthttp"`
+	Port         string          `mapstructure:"port"`
+	Host         string          `mapstructure:"host"`
+	ReadTimeout  time.Duration   `mapstructure:"read_timeout"`
+	WriteTimeout time.Duration   `mapstructure:"write_timeout"`
+	Fasthttp     *FasthttpConfig `mapstructure:"fasthttp"`
 }
 
 type FasthttpConfig struct {

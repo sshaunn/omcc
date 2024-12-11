@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 	"ohmycontrolcenter.tech/omcc/internal/domain/model"
@@ -11,6 +12,26 @@ import (
 type CustomerSocialBindingRepositoryImpl struct {
 	db  *gorm.DB
 	log logger.Logger
+}
+
+func (r *CustomerSocialBindingRepositoryImpl) FindSocialBindingByCustomerId(ctx context.Context, tx *gorm.DB, customerId string) (*model.CustomerSocialBinding, error) {
+	db := tx
+	if db == nil {
+		db = r.db
+	}
+
+	var binding model.CustomerSocialBinding
+	result := db.WithContext(ctx).
+		Where("customer_id = ?", customerId).
+		First(&binding)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("social binding not found for customer: %s", customerId)
+		}
+		return nil, fmt.Errorf("failed to find social binding: %w", result.Error)
+	}
+
+	return &binding, nil
 }
 
 func (r *CustomerSocialBindingRepositoryImpl) FindStatusByUid(ctx context.Context, tx *gorm.DB, uid string) (bool, error) {

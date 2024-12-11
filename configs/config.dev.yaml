@@ -5,6 +5,8 @@ app:
 server:
   port: "8990"
   host: "localhost"
+  read_timeout: 30
+  write_timeout: 30
   fasthttp:
     maxConnsPerHost: 100 # concurrent worker number
     maxIdleConnDuration: 30
