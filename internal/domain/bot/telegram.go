@@ -5,13 +5,13 @@ import (
 	"fmt"
 	tele "gopkg.in/telebot.v3"
 	"log"
-	"ohmycontrolcenter.tech/omcc/internal/api/middleware"
 	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler/group"
 	"ohmycontrolcenter.tech/omcc/internal/domain/bot/handler/private"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/exchange"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
+	"ohmycontrolcenter.tech/omcc/internal/middleware"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 

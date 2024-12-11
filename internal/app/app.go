@@ -2,20 +2,25 @@ package app
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"gorm.io/gorm"
-	"ohmycontrolcenter.tech/omcc/internal/api/middleware"
+	"net/http"
 	"ohmycontrolcenter.tech/omcc/internal/domain/bot"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
+	"ohmycontrolcenter.tech/omcc/internal/middleware"
+	"ohmycontrolcenter.tech/omcc/internal/server"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
 )
 
 type App struct {
-	cfg    *config.Config
-	log    logger.Logger
-	bot    *bot.TelegramBot
-	ctx    context.Context
-	cancel context.CancelFunc
-	db     *gorm.DB
+	cfg        *config.Config
+	log        logger.Logger
+	bot        *bot.TelegramBot
+	httpServer *server.HTTPServer
+	ctx        context.Context
+	cancel     context.CancelFunc
+	db         *gorm.DB
 }
 
 func NewApp(ctx context.Context, cfg *config.Config, log logger.Logger) (*App, error) {
@@ -31,26 +36,38 @@ func NewApp(ctx context.Context, cfg *config.Config, log logger.Logger) (*App, e
 		return nil, err
 	}
 
+	httpServer := server.NewHTTPServer(cfg, log)
+
 	return &App{
-		cfg:    cfg,
-		log:    log,
-		bot:    b,
-		ctx:    ctx,
-		cancel: cancel,
+		cfg:        cfg,
+		log:        log,
+		bot:        b,
+		httpServer: httpServer,
+		ctx:        ctx,
+		cancel:     cancel,
 	}, nil
 }
 
 func (a *App) Start() error {
-	a.log.Info("starting application")
+	a.log.Info("starting application with telebot and httpserver")
 
-	// 启动 bot
-	//if err := a.bot.Start(a.ctx); err != nil {
-	//	return err
-	//}
+	// start bot in goroutine
 	go func() {
 		err := a.bot.Start(a.ctx)
 		if err != nil {
 			a.log.Info("starting application failed")
+		}
+	}()
+
+	go func() {
+		a.log.Info(fmt.Sprintf("Started admin server listening on port=%s", a.cfg.Server.Port))
+		err := a.httpServer.Start()
+		if err != nil {
+			if !errors.Is(err, http.ErrServerClosed) {
+				a.log.Error("http server failed to start",
+					logger.Error(err),
+				)
+			}
 		}
 	}()
 
@@ -66,6 +83,11 @@ func (a *App) Stop() error {
 
 	// stop bot
 	a.bot.Stop()
+	if err := a.httpServer.Stop(a.ctx); err != nil {
+		a.log.Error("failed to stop http server",
+			logger.Error(err),
+		)
+	}
 
 	a.log.Info("application stopped successfully")
 	return nil

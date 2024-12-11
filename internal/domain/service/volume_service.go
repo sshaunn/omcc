@@ -111,7 +111,7 @@ func sumMoneyDecimals(volumeList []*bitget.CustomerVolume) (*big.Float, error) {
 
 //func (v *VolumeService) SaveTradingHistories(ctx context.Context, uid string, results []*bitget.CustomerVolume) error {
 //	histories := make([]*model.TradingHistory, len(results))
-//	binding, err := v.customerTradingBinding.GetTradingBindingById(ctx, v.db, uid)
+//	binding, err := v.customerTradingBinding.FindTradingBindingByUid(ctx, v.db, uid)
 //	if err != nil {
 //		return err
 //	}

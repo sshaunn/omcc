@@ -91,6 +91,19 @@ func (m MemberStatus) Value() string {
 	}
 }
 
+func (s Status) Value() string {
+	switch s {
+	case Normal:
+		return "普通成員"
+	case Whitelisted:
+		return "白名單"
+	case Blacklisted:
+		return "黑名單"
+	default:
+		return "Unknown"
+	}
+}
+
 func GetMemberStatusFromValue(value tele.MemberStatus) MemberStatus {
 	if status, ok := statusMap[string(value)]; ok {
 		return status
