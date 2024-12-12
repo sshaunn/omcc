@@ -74,11 +74,21 @@ func (m *SendingMessageService) SendMessage2MultipleCustomers(ctx context.Contex
 }
 
 func (m *SendingMessageService) SendMessage2Groups(ctx context.Context, groupIDs []int64, message string) ([]int64, error) {
+	errChan := make(chan int64, len(groupIDs))
+	var wg sync.WaitGroup
 	for _, groupID := range groupIDs {
-		_, err := m.bot.Send(&tele.Chat{ID: groupID}, message)
-		if err != nil {
-			m.log.Info(fmt.Sprintf("Failed to send to this telegram group with groupId=%d", groupID))
-		}
+		wg.Add(1)
+		go func(id int64) {
+			_, err := m.bot.Send(&tele.Chat{ID: groupID}, message)
+			if err != nil {
+				m.log.Info(fmt.Sprintf("Failed to send to this telegram group with groupId=%d", groupID))
+			}
+		}(groupID)
+
 	}
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
 	return nil, nil
 }

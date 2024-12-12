@@ -19,6 +19,22 @@ type MockCustomerService struct {
 	mock.Mock
 }
 
+func (m *MockCustomerService) UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error {
+	args := m.Called(ctx, req)
+	if args.Get(0) == nil {
+		return args.Error(0)
+	}
+	return args.Error(0)
+}
+
+func (m *MockCustomerService) DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error) {
+	args := m.Called(ctx, req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]string), args.Error(1)
+}
+
 // 确保 MockCustomerService 实现了所有接口方法
 func (m *MockCustomerService) GetCustomerInfoByUid(ctx context.Context, uid string) (*model.CustomerInfoResponse, error) {
 	args := m.Called(ctx, uid)
@@ -49,6 +65,8 @@ func setupTestRouter(mockService *MockCustomerService) *gin.Engine {
 		{
 			admin.GET("/customer", handler.SearchByUID)
 			admin.GET("/customers", handler.GetAllCustomers)
+			admin.PUT("/customer/update", handler.UpdateCustomerStatus)
+			admin.DELETE("/customer/delete", handler.DeleteCustomer)
 		}
 	}
 

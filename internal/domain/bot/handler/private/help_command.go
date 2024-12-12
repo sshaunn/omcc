@@ -15,5 +15,7 @@ func NewHelpCommand(log logger.Logger) HelpCommand {
 }
 
 func (h *HelpCommand) Handle(c tele.Context) error {
-	return c.Send(common.HelpMessage)
+	return c.Send(common.HelpMessage, &tele.SendOptions{
+		ParseMode: tele.ModeMarkdownV2,
+	})
 }

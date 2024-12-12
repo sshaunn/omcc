@@ -50,11 +50,14 @@ https://t.me/wedjatbtc
 
 🦀≡≡≡≡≡≡≡≡▷►◈◄◁≡≡≡≡≡≡≡≡🦀`
 
-	HelpMessage = `/start    	  - 開始使用機器人
-/help     	  - 了解所有指令說明 請輸入此指令
-/verify <uid>   	  - 驗證uid指令 請輸入你的數字UID
-/volume <uid>   - 交易總額查詢 請輸入此指令
-/account <uid>  - 更改電報帳號綁定`
+	HelpMessage = "```\n" +
+		`/start          - 開始使用機器人
+/help           - 了解所有指令說明 請輸入此指令
+/status <uid>   - 查詢目前電報帳號狀態
+/verify <uid>   - 驗證uid指令，請輸入你的數字UID
+/volume <uid>   - 交易總額查詢，請輸入此指令
+/account <uid>  - 更改電報帳號綁定` +
+		"\n```"
 
 	ProcessingMessage          = "正在驗證 UID，請稍候..."
 	ServerErrorMessage         = "驗證服務暫時無法使用，請稍後重試❌"
