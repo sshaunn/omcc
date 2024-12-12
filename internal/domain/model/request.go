@@ -6,3 +6,7 @@ type UpdateCustomerStatusRequest struct {
 	Status       *string `json:"status" binding:"omitempty"`
 	MemberStatus *string `json:"member_status" binding:"omitempty"`
 }
+
+type DeleteCustomerRequest struct {
+	IdList []string `json:"id_list" binding:"required"`
+}

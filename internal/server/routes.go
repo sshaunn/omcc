@@ -18,6 +18,7 @@ func (s *HTTPServer) registerRoutes() {
 			ad.GET("/customer", customerHandler.SearchByUID)
 			ad.GET("/customers", customerHandler.GetAllCustomers)
 			ad.PUT("/customer/update", customerHandler.UpdateCustomerStatus)
+			ad.DELETE("/customer/delete", customerHandler.DeleteCustomer)
 		}
 	}
 

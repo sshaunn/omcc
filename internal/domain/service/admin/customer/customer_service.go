@@ -14,6 +14,7 @@ type CustomerServiceInterface interface {
 	GetCustomerInfoByUid(ctx context.Context, uid string) (*model.CustomerInfoResponse, error)
 	GetAllCustomers(ctx context.Context, page, limit int) (*model.PaginatedResponse[*model.CustomerInfoResponse], error)
 	UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error
+	DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error)
 }
 
 // CustomerService struct
@@ -105,4 +106,12 @@ func (c *CustomerService) UpdateCustomerStatus(ctx context.Context, req *model.U
 	}
 
 	return nil
+}
+
+func (c *CustomerService) DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error) {
+	ids, err := c.customerRepo.DeleteCustomer(ctx, c.db, req.IdList)
+	if err != nil {
+		return ids, fmt.Errorf("failed to delete customer ids=%v, error=%w", ids, err)
+	}
+	return ids, nil
 }

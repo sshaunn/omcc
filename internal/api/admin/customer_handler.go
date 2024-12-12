@@ -88,7 +88,33 @@ func (h *CustomerHandler) UpdateCustomerStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code":    "success",
+		"code":    "Success",
 		"message": "Customer status updated successfully",
+	})
+}
+
+func (h *CustomerHandler) DeleteCustomer(c *gin.Context) {
+	var req model.DeleteCustomerRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Error("invalid request parameters")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request parameters",
+		})
+		return
+	}
+	ids, err := h.customerService.DeleteCustomer(c.Request.Context(), &req)
+	if err != nil {
+		h.log.Error("failed to delete customer",
+			logger.Any("failed_ids", ids))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"id_list": ids,
+			"code":    "Failure",
+			"message": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"id_list": ids,
+		"code":    "Success",
+		"message": "Customer deleted successfully",
 	})
 }
