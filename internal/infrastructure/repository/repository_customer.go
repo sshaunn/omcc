@@ -14,6 +14,34 @@ type CustomerRepositoryImpl struct {
 	log logger.Logger
 }
 
+func (r *CustomerRepositoryImpl) DeleteCustomer(ctx context.Context, tx *gorm.DB, ids []string) ([]string, error) {
+	db := tx
+	if db == nil {
+		db = r.db
+	}
+	var errorIds []string
+	var lastErr error
+	for _, id := range ids {
+		result := db.WithContext(ctx).Model(&model.CustomerSocialBinding{}).
+			Where("customer_id = ?", id).
+			Updates(map[string]interface{}{
+				"is_active": false,
+			})
+
+		if result.Error != nil {
+			errorIds = append(errorIds, id)
+			lastErr = result.Error
+			r.log.Error("failed to update customer status",
+				logger.String("customer_id", id),
+				logger.Error(result.Error))
+		}
+	}
+	if len(errorIds) > 0 {
+		return errorIds, fmt.Errorf("failed to inActive customers %v with error: %v", errorIds, lastErr)
+	}
+	return ids, nil
+}
+
 func (r *CustomerRepositoryImpl) FindAllCustomers(ctx context.Context, tx *gorm.DB, page, limit int) ([]*model.CustomerWithBindings, int64, error) {
 	db := tx
 	if db == nil {

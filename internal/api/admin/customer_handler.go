@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"ohmycontrolcenter.tech/omcc/internal/domain/model"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/admin/customer"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"strconv"
@@ -62,4 +63,32 @@ func (h *CustomerHandler) GetAllCustomers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, customersInfo)
+}
+
+func (h *CustomerHandler) UpdateCustomerStatus(c *gin.Context) {
+	var req model.UpdateCustomerStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Error("invalid request parameters",
+			logger.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request parameters",
+		})
+		return
+	}
+
+	err := h.customerService.UpdateCustomerStatus(c.Request.Context(), &req)
+	if err != nil {
+		h.log.Error("failed to update customer status",
+			logger.String("customer_id", req.CustomerId),
+			logger.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    "success",
+		"message": "Customer status updated successfully",
+	})
 }

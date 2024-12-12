@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gorm.io/gorm"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/model"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/repository"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
@@ -12,6 +13,7 @@ import (
 type CustomerServiceInterface interface {
 	GetCustomerInfoByUid(ctx context.Context, uid string) (*model.CustomerInfoResponse, error)
 	GetAllCustomers(ctx context.Context, page, limit int) (*model.PaginatedResponse[*model.CustomerInfoResponse], error)
+	UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error
 }
 
 // CustomerService struct
@@ -87,4 +89,20 @@ func (c *CustomerService) GetAllCustomers(ctx context.Context, page, limit int) 
 		})
 	}
 	return model.NewPaginatedResponse(customerResponses, total, page, limit), nil
+}
+
+func (c *CustomerService) UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error {
+	customer, err := c.customerRepo.FindById(ctx, c.db, req.CustomerId)
+	if err != nil {
+		return fmt.Errorf("customer not found: %w", err)
+	}
+	if customer == nil {
+		return fmt.Errorf("customer not found")
+	}
+	err = c.socialBindingRepo.UpdateCustomerStatus(ctx, c.db, req.CustomerId, req.SocialId, *req.Status, common.GetMemberStatusFromString(*req.MemberStatus))
+	if err != nil {
+		return fmt.Errorf("failed to update status: %w", err)
+	}
+
+	return nil
 }

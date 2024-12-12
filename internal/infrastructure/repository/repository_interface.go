@@ -11,6 +11,7 @@ type CustomerRepository interface {
 	Create(ctx context.Context, tx *gorm.DB, customer *model.Customer) (*model.Customer, error)
 	FindById(ctx context.Context, tx *gorm.DB, id string) (*model.Customer, error)
 	FindAllCustomers(ctx context.Context, tx *gorm.DB, page, limit int) ([]*model.CustomerWithBindings, int64, error)
+	DeleteCustomer(ctx context.Context, tx *gorm.DB, ids []string) ([]string, error)
 }
 
 type CustomerSocialBindingRepository interface {
@@ -18,6 +19,7 @@ type CustomerSocialBindingRepository interface {
 	UpdateUserByUid(ctx context.Context, tx *gorm.DB, uid string, userInfo map[string]interface{}) error
 	FindStatusByUid(ctx context.Context, tx *gorm.DB, uid string) (bool, error)
 	FindSocialBindingByCustomerId(ctx context.Context, tx *gorm.DB, customerId string) (*model.CustomerSocialBinding, error)
+	UpdateCustomerStatus(ctx context.Context, tx *gorm.DB, customerID string, socialID string, status string, memberStatus common.MemberStatus) error
 }
 
 type CustomerTradingBindingRepository interface {

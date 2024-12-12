@@ -111,6 +111,13 @@ func GetMemberStatusFromValue(value tele.MemberStatus) MemberStatus {
 	return Unknown
 }
 
+func GetMemberStatusFromString(value string) MemberStatus {
+	if status, ok := statusMap[value]; ok {
+		return status
+	}
+	return Unknown
+}
+
 func (p SocialPlatformType) Name() string {
 	return [...]string{"TELEGRAM", "LINE"}[p]
 }

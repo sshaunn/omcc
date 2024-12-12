@@ -5,13 +5,38 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"ohmycontrolcenter.tech/omcc/internal/common"
 	"ohmycontrolcenter.tech/omcc/internal/domain/model"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
+	"time"
 )
 
 type CustomerSocialBindingRepositoryImpl struct {
 	db  *gorm.DB
 	log logger.Logger
+}
+
+func (r *CustomerSocialBindingRepositoryImpl) UpdateCustomerStatus(ctx context.Context, tx *gorm.DB, customerID string, socialID string, status string, memberStatus common.MemberStatus) error {
+	db := tx
+	if db == nil {
+		db = r.db
+	}
+
+	result := db.WithContext(ctx).
+		Model(&model.CustomerSocialBinding{}).
+		Where("customer_id = ? AND id = ?", customerID, socialID).
+		Updates(map[string]interface{}{
+			"status":        status,
+			"member_status": memberStatus,
+			"updated_at":    time.Now(),
+		})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update customer social binding: %w", result.Error)
+	}
+
+	return nil
+
 }
 
 func (r *CustomerSocialBindingRepositoryImpl) FindSocialBindingByCustomerId(ctx context.Context, tx *gorm.DB, customerId string) (*model.CustomerSocialBinding, error) {

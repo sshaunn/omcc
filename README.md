@@ -4,6 +4,8 @@
 ```
 /v{version}/admin/customer?uid=
 /v{version}/admin/customers?page=&limit=
+/v{version}/admin/customer/update
+/v{version}/admin/customer/delete
 ```
 
 ### DB structure:
