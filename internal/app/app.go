@@ -36,7 +36,7 @@ func NewApp(ctx context.Context, cfg *config.Config, log logger.Logger) (*App, e
 		return nil, err
 	}
 
-	httpServer := server.NewHTTPServer(cfg, log)
+	httpServer := server.NewHTTPServer(cfg, log, b)
 
 	return &App{
 		cfg:        cfg,

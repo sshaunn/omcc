@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"ohmycontrolcenter.tech/omcc/internal/domain/model"
 	"ohmycontrolcenter.tech/omcc/internal/domain/service/admin/customer"
+	"ohmycontrolcenter.tech/omcc/internal/domain/service/tasks"
 	"ohmycontrolcenter.tech/omcc/pkg/logger"
 	"strconv"
 )
 
 type CustomerHandler struct {
 	customerService customer.CustomerServiceInterface
+	migrateService  tasks.MigrateService
 	log             logger.Logger
 }
 
@@ -18,6 +20,13 @@ func NewCustomerHandler(customerService customer.CustomerServiceInterface, log l
 	return &CustomerHandler{
 		customerService: customerService,
 		log:             log,
+	}
+}
+
+func NewMigrateCustomerHandler(migrateService *tasks.MigrateService, log logger.Logger) *CustomerHandler {
+	return &CustomerHandler{
+		migrateService: *migrateService,
+		log:            log,
 	}
 }
 
@@ -116,5 +125,19 @@ func (h *CustomerHandler) DeleteCustomer(c *gin.Context) {
 		"id_list": ids,
 		"code":    "Success",
 		"message": "Customer deleted successfully",
+	})
+}
+
+func (h *CustomerHandler) Migrate(c *gin.Context) {
+	err := h.migrateService.Migrate()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    "Failure",
+			"message": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    "Success",
+		"message": "migrate successfully",
 	})
 }

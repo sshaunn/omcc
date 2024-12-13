@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
@@ -25,6 +26,18 @@ func NewGormLogger(log log.Logger) logger.Interface {
 		log:     log,
 		SlowSQL: time.Second, // Threshold for slow SQL logging
 	}
+}
+
+// NewPostgresClient Temporary using this for migrating db records from postgres to mysql
+// TODO after success migrating then cleanup this
+func NewPostgresClient(log log.Logger) (*gorm.DB, error) {
+	// this is in .env.dev file temporarily
+	dsn := ""
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to postgres database: %w", err)
+	}
+	return db, nil
 }
 
 func NewMySqlClient(cfg *config.DatabaseConfig, log log.Logger) (*gorm.DB, error) {

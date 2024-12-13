@@ -70,7 +70,9 @@ func (m *SendingMessageService) SendMessage2MultipleCustomers(ctx context.Contex
 	if len(errorIds) > 0 {
 		return errorIds, exception.ErrSendingMessage
 	}
-	return nil, nil
+	m.log.Info(fmt.Sprintf("Sending message to these telegram group with group_ids=%v", chatIDs),
+		logger.String("message", message))
+	return chatIDs, nil
 }
 
 func (m *SendingMessageService) SendMessage2Groups(ctx context.Context, groupIDs []int64, message string) ([]int64, error) {
@@ -90,5 +92,7 @@ func (m *SendingMessageService) SendMessage2Groups(ctx context.Context, groupIDs
 		wg.Wait()
 		close(errChan)
 	}()
-	return nil, nil
+	m.log.Info(fmt.Sprintf("Sending message to these telegram group with group_ids=%v", groupIDs),
+		logger.String("message", message))
+	return groupIDs, nil
 }

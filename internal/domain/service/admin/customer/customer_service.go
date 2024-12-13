@@ -17,8 +17,8 @@ type CustomerServiceInterface interface {
 	DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error)
 }
 
-// CustomerService struct
-type CustomerService struct {
+// CustomerServices struct
+type CustomerServices struct {
 	customerRepo       repository.CustomerRepository
 	socialBindingRepo  repository.CustomerSocialBindingRepository
 	tradingBindingRepo repository.CustomerTradingBindingRepository
@@ -28,8 +28,8 @@ type CustomerService struct {
 	Log                logger.Logger
 }
 
-func NewCustomerService(db *gorm.DB, log logger.Logger) *CustomerService {
-	return &CustomerService{
+func NewCustomerService(db *gorm.DB, log logger.Logger) *CustomerServices {
+	return &CustomerServices{
 		customerRepo:       repository.NewCustomerRepository(db, log),
 		socialBindingRepo:  repository.NewCustomerSocialRepository(db, log),
 		tradingBindingRepo: repository.NewCustomerTradingRepository(db, log),
@@ -40,7 +40,7 @@ func NewCustomerService(db *gorm.DB, log logger.Logger) *CustomerService {
 	}
 }
 
-func (c *CustomerService) GetCustomerInfoByUid(ctx context.Context, uid string) (*model.CustomerInfoResponse, error) {
+func (c *CustomerServices) GetCustomerInfoByUid(ctx context.Context, uid string) (*model.CustomerInfoResponse, error) {
 	customerInfo, err := c.tradingBindingRepo.FindTradingBindingByUid(ctx, c.db, uid)
 
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *CustomerService) GetCustomerInfoByUid(ctx context.Context, uid string) 
 	return customerInfo, nil
 }
 
-func (c *CustomerService) GetAllCustomers(ctx context.Context, page, limit int) (*model.PaginatedResponse[*model.CustomerInfoResponse], error) {
+func (c *CustomerServices) GetAllCustomers(ctx context.Context, page, limit int) (*model.PaginatedResponse[*model.CustomerInfoResponse], error) {
 	if page < 1 {
 		page = 1
 	}
@@ -92,7 +92,7 @@ func (c *CustomerService) GetAllCustomers(ctx context.Context, page, limit int) 
 	return model.NewPaginatedResponse(customerResponses, total, page, limit), nil
 }
 
-func (c *CustomerService) UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error {
+func (c *CustomerServices) UpdateCustomerStatus(ctx context.Context, req *model.UpdateCustomerStatusRequest) error {
 	customer, err := c.customerRepo.FindById(ctx, c.db, req.CustomerId)
 	if err != nil {
 		return fmt.Errorf("customer not found: %w", err)
@@ -108,7 +108,7 @@ func (c *CustomerService) UpdateCustomerStatus(ctx context.Context, req *model.U
 	return nil
 }
 
-func (c *CustomerService) DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error) {
+func (c *CustomerServices) DeleteCustomer(ctx context.Context, req *model.DeleteCustomerRequest) ([]string, error) {
 	ids, err := c.customerRepo.DeleteCustomer(ctx, c.db, req.IdList)
 	if err != nil {
 		return ids, fmt.Errorf("failed to delete customer ids=%v, error=%w", ids, err)

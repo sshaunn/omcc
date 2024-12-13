@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"ohmycontrolcenter.tech/omcc/internal/domain/bot"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/config"
 	"ohmycontrolcenter.tech/omcc/internal/infrastructure/database"
 	"ohmycontrolcenter.tech/omcc/internal/middleware"
@@ -18,9 +19,10 @@ type HTTPServer struct {
 	cfg    *config.Config
 	log    logger.Logger
 	srv    *http.Server
+	bot    *bot.TelegramBot
 }
 
-func NewHTTPServer(cfg *config.Config, log logger.Logger) *HTTPServer {
+func NewHTTPServer(cfg *config.Config, log logger.Logger, bot *bot.TelegramBot) *HTTPServer {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	db, _ := database.NewMySqlClient(&cfg.Database, log)
@@ -35,7 +37,7 @@ func NewHTTPServer(cfg *config.Config, log logger.Logger) *HTTPServer {
 	}
 
 	// route register
-	server.registerRoutes()
+	server.registerRoutes(cfg, bot)
 
 	return server
 }

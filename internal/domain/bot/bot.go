@@ -6,9 +6,9 @@ import (
 )
 
 type Bot interface {
-	// Start bot
+	// Start Bot
 	Start(ctx context.Context) error
-	// Stop bot
+	// Stop Bot
 	Stop()
 	// SendMessage send telegram message
 	SendMessage(ctx context.Context, chatID int64, message string) error

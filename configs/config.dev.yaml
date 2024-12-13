@@ -47,6 +47,12 @@ exchange:
     customer_list: "/api/broker/v1/agent/customerList"
     customer_trade_volume: "/api/broker/v1/agent/customerTradeVolumnList"
 
+tasks:
+  bitget:
+    daily_volume_scheduler:
+      rate_limit: 10
+
+
 database:
   host: localhost
   port: 3306

@@ -10,3 +10,8 @@ type UpdateCustomerStatusRequest struct {
 type DeleteCustomerRequest struct {
 	IdList []string `json:"id_list" binding:"required"`
 }
+
+type AdminMessagingRequest struct {
+	Ids     []int64 `json:"id_list" binding:"required"`
+	Message string  `json:"message" binding:"required"`
+}

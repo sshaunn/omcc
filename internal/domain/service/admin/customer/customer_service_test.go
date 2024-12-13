@@ -17,6 +17,11 @@ type MockCustomerRepository struct {
 	mock.Mock
 }
 
+func (m *MockCustomerRepository) DeleteCustomer(ctx context.Context, tx *gorm.DB, ids []string) ([]string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *MockCustomerRepository) Create(ctx context.Context, tx *gorm.DB, customer *model.Customer) (*model.Customer, error) {
 	args := m.Called(ctx, tx, customer)
 	return args.Get(0).(*model.Customer), args.Error(1)
@@ -159,7 +164,7 @@ func TestCustomerService_GetAllCustomers(t *testing.T) {
 			tt.setupMocks(mockCustomerRepo, mockCustomerSocialRepo, mockCustomerTradingRepo, mockTradingPlatformRepo, mockSocialPlatformRepo)
 
 			// Create service
-			service := &CustomerService{
+			service := &CustomerServices{
 				customerRepo: mockCustomerRepo,
 				Log:          logger.NewLogger(),
 			}
@@ -226,7 +231,7 @@ func TestCustomerService_GetCustomerInfoByUid(t *testing.T) {
 			mockTradingRepo := new(MockCustomerTradingBindingRepository)
 			tt.setupMocks(mockTradingRepo)
 
-			service := &CustomerService{
+			service := &CustomerServices{
 				tradingBindingRepo: mockTradingRepo,
 				Log:                logger.NewLogger(),
 			}

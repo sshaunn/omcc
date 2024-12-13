@@ -16,14 +16,14 @@ import (
 )
 
 type TelegramBot struct {
-	bot        *tele.Bot
+	Bot        *tele.Bot
 	cfg        *config.Config
 	log        logger.Logger
 	middleware *middleware.Manager
 }
 
 func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middleware.Manager) (*TelegramBot, error) {
-	log.Info("initializing telegram bot",
+	log.Info("initializing telegram Bot",
 		logger.String("webhook_url", cfg.Telegram.WebhookURL),
 	)
 
@@ -49,11 +49,11 @@ func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middlewar
 
 	b, err := tele.NewBot(settings)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create telegram bot: %w", err)
+		return nil, fmt.Errorf("failed to create telegram Bot: %w", err)
 	}
 
 	tb := &TelegramBot{
-		bot:        b,
+		Bot:        b,
 		cfg:        cfg,
 		log:        log,
 		middleware: middleware,
@@ -66,7 +66,7 @@ func NewTelegramBot(cfg *config.Config, log logger.Logger, middleware *middlewar
 }
 
 func (t *TelegramBot) checkWebhookStatus() error {
-	webhook, err := t.bot.Webhook()
+	webhook, err := t.Bot.Webhook()
 	if err != nil {
 		return fmt.Errorf("failed to get webhook info: %w", err)
 	}
@@ -79,22 +79,22 @@ func (t *TelegramBot) checkWebhookStatus() error {
 
 func (t *TelegramBot) Start(ctx context.Context) error {
 	go func() {
-		t.bot.Start()
+		t.Bot.Start()
 	}()
 
 	return nil
 }
 
-// Stop the telegram bot
+// Stop the telegram Bot
 func (t *TelegramBot) Stop() {
-	t.bot.Stop()
+	t.Bot.Stop()
 }
 
 // registerHandlers 注册命令处理器
 func (t *TelegramBot) registerHandlers() {
 	middlewareHandler := t.middleware.TelegramMiddleware
 
-	groupHandler := group.NewGroupMessageHandler(&t.cfg.Telegram, t.bot, t.log)
+	groupHandler := group.NewGroupMessageHandler(&t.cfg.Telegram, t.Bot, t.log)
 
 	bitgetClient := exchange.NewBitgetClient(&t.cfg.Exchange.BitgetConfig, t.log)
 	verifyService := service.NewVerifyService(t.cfg, bitgetClient, t.log)
@@ -102,29 +102,29 @@ func (t *TelegramBot) registerHandlers() {
 	checkService := service.NewStatusService(t.cfg, t.log)
 	accountService := service.NewAccountService(t.cfg, t.log)
 
-	verifyCommand := private.NewVerifyCommand(t.bot, t.log, *verifyService)
+	verifyCommand := private.NewVerifyCommand(t.Bot, t.log, *verifyService)
 	volumeCommand := private.NewVolumeCommand(t.log, *volumeService)
 	startCommand := private.NewStartCommand(t.log)
 	checkCommand := private.NewCheckCommand(t.log, *checkService)
 	helpCommand := private.NewHelpCommand(t.log)
-	accountCommand := private.NewAccountCommand(t.bot, t.log, *accountService)
+	accountCommand := private.NewAccountCommand(t.Bot, t.log, *accountService)
 	onTextCommand := private.NewOnTextCommand(t.log)
 
 	// processing non-command text message
-	t.bot.Handle(tele.OnText, middlewareHandler(handlerType(onTextCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(tele.OnText, middlewareHandler(handlerType(onTextCommand.Handle, groupHandler.Handle)))
 
 	// register /start command
-	t.bot.Handle(common.StartCommandName, middlewareHandler(handlerType(startCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.StartCommandName, middlewareHandler(handlerType(startCommand.Handle, groupHandler.Handle)))
 	// register /help command
-	t.bot.Handle(common.HelpCommandName, middlewareHandler(handlerType(helpCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.HelpCommandName, middlewareHandler(handlerType(helpCommand.Handle, groupHandler.Handle)))
 	// register /verify command
-	t.bot.Handle(common.VerifyCommandName, middlewareHandler(handlerType(verifyCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.VerifyCommandName, middlewareHandler(handlerType(verifyCommand.Handle, groupHandler.Handle)))
 	// register /volume command
-	t.bot.Handle(common.VolumeCommandName, middlewareHandler(handlerType(volumeCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.VolumeCommandName, middlewareHandler(handlerType(volumeCommand.Handle, groupHandler.Handle)))
 	// register /check command
-	t.bot.Handle(common.StatusCommandName, middlewareHandler(handlerType(checkCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.StatusCommandName, middlewareHandler(handlerType(checkCommand.Handle, groupHandler.Handle)))
 	// register /account command
-	t.bot.Handle(common.AccountCommandName, middlewareHandler(handlerType(accountCommand.Handle, groupHandler.Handle)))
+	t.Bot.Handle(common.AccountCommandName, middlewareHandler(handlerType(accountCommand.Handle, groupHandler.Handle)))
 
 }
 
@@ -144,6 +144,6 @@ func handlerType(handlerFunc ...tele.HandlerFunc) middleware.Handler {
 
 // SendMessage 发送消息
 func (t *TelegramBot) SendMessage(ctx context.Context, chatID int64, message string) error {
-	_, err := t.bot.Send(&tele.Chat{ID: chatID}, message)
+	_, err := t.Bot.Send(&tele.Chat{ID: chatID}, message)
 	return err
 }
