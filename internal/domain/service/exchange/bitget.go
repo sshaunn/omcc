@@ -14,12 +14,6 @@ type Client struct {
 	log             logger.Logger
 }
 
-//	type Client struct {
-//		BitgetApiClient *c.BitgetApiClient
-//		config          *config.BitgetConfig
-//		log             logger.Logger
-//	}
-
 func NewBitgetClient(config *config.BitgetConfig, log logger.Logger) *Client {
 	c := client.NewBitgetClient(config, log)
 	return &Client{
@@ -36,7 +30,7 @@ func (b *Client) GetCustomerInfo(ctx context.Context, uid string) (string, error
 		"pageSize": "100",
 	}
 
-	response, err := b.BitgetApiClient.Post(b.config.CustomerList, params)
+	response, err := b.BitgetApiClient.Post(ctx, b.config.CustomerList, params)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +51,7 @@ func (b *Client) GetCustomerVolumeList(ctx context.Context, uid string) (string,
 		logger.String("endpoint", b.config.CustomerList),
 		logger.Any("params", params))
 
-	response, err := b.BitgetApiClient.Post(b.config.CustomerTradeVolume, params)
+	response, err := b.BitgetApiClient.Post(ctx, b.config.CustomerTradeVolume, params)
 	if err != nil {
 		return "", err
 	}

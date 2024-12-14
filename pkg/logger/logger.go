@@ -29,6 +29,10 @@ func Int64(key string, value int64) Field {
 	return zap.Int64(key, value)
 }
 
+func UInt64(key string, value uint64) Field {
+	return zap.Uint64(key, value)
+}
+
 func Int(key string, value int) Field {
 	return zap.Int(key, value)
 }

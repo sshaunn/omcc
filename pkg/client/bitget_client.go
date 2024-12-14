@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
@@ -14,9 +15,10 @@ import (
 )
 
 type BitgetClient struct {
-	client *fasthttp.Client
-	log    logger.Logger
-	cfg    *config.BitgetConfig
+	client      *fasthttp.Client
+	log         logger.Logger
+	cfg         *config.BitgetConfig
+	rateLimiter *config.RateLimiter
 }
 
 type Options func(*BitgetClient)
@@ -29,12 +31,16 @@ func NewBitgetClient(cfg *config.BitgetConfig, log logger.Logger) *BitgetClient 
 			ReadTimeout:         5 * time.Second,
 			WriteTimeout:        5 * time.Second,
 		},
-		log: log,
-		cfg: cfg,
+		log:         log,
+		cfg:         cfg,
+		rateLimiter: config.GetBitgetRateLimiter(log),
 	}
 }
 
-func (b *BitgetClient) Post(path string, body interface{}) ([]byte, error) {
+func (b *BitgetClient) Post(ctx context.Context, path string, body interface{}) ([]byte, error) {
+	if err := b.rateLimiter.Wait(ctx); err != nil {
+		return nil, fmt.Errorf("rate limiter error: %w", err)
+	}
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
